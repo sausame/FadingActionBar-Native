@@ -157,7 +157,12 @@ public class FadingActionBarHelper {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             mActionBarBackgroundDrawable.setCallback(mDrawableCallback);
         }
-        mActionBarBackgroundDrawable.setAlpha(0);
+        
+        if (mHeaderView != null) {
+        	mActionBarBackgroundDrawable.setAlpha(0);
+        } else {
+            mActionBarBackgroundDrawable.setAlpha(255);        	
+        }
     }
 
     protected ActionBar getActionBar(Activity activity) {
@@ -187,19 +192,23 @@ public class FadingActionBarHelper {
 
         mContentContainer = (ViewGroup) mScrollView.findViewById(R.id.fab__container);
         mContentContainer.addView(mContentView);
-        mHeaderContainer = (FrameLayout) mScrollView.findViewById(R.id.fab__header_container);
-        initializeGradient(mHeaderContainer);
+        
         if (mHeaderView != null) {
+	        mHeaderContainer = (FrameLayout) mScrollView.findViewById(R.id.fab__header_container);
+	        initializeGradient(mHeaderContainer);
+        
         	mHeaderContainer.addView(mHeaderView, 0);
+        	mMarginView = mContentContainer.findViewById(R.id.fab__content_top_margin);
         }
-        mMarginView = mContentContainer.findViewById(R.id.fab__content_top_margin);
 
         return mScrollView;
     }
 
     private NotifyingScrollView.OnScrollChangedListener mOnScrollChangedListener = new NotifyingScrollView.OnScrollChangedListener() {
         public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
-            onNewScroll(t);
+        	if (mHeaderView != null) {
+        		onNewScroll(t);
+        	}
         }
     };
 
@@ -309,7 +318,7 @@ public class FadingActionBarHelper {
         int newAlpha = (int) (ratio * 255);
         mActionBarBackgroundDrawable.setAlpha(newAlpha);
     }
-
+    
     private void initializeGradient(ViewGroup headerContainer) {
         View gradientView = headerContainer.findViewById(R.id.fab__gradient);
         int gradient = R.drawable.fab__gradient;
