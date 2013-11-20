@@ -48,7 +48,6 @@ public class FadingActionBarHelper {
     private LayoutInflater mInflater;
     private boolean mLightActionBar;
     private boolean mUseParallax = true;
-    private int mLastDampedScroll;
     private int mLastHeaderHeight = -1;
     private ViewGroup mContentContainer;
     private ViewGroup mScrollView;
@@ -161,7 +160,7 @@ public class FadingActionBarHelper {
         if (mHeaderView != null) {
         	mActionBarBackgroundDrawable.setAlpha(0);
         } else {
-            mActionBarBackgroundDrawable.setAlpha(255);        	
+            mActionBarBackgroundDrawable.setAlpha(255);
         }
     }
 
@@ -258,13 +257,12 @@ public class FadingActionBarHelper {
         public void onScrollStateChanged(AbsListView view, int scrollState) {
         }
     };
-    private int mLastScrollPosition;
 
     private void onNewScroll(int scrollPosition) {
         if (mActionBar == null) {
             return;
         }
-
+        
         int currentHeaderHeight = mHeaderContainer.getHeight();
         if (currentHeaderHeight != mLastHeaderHeight) {
             updateHeaderHeight(currentHeaderHeight);
@@ -275,25 +273,19 @@ public class FadingActionBarHelper {
         int newAlpha = (int) (ratio * 255);
         mActionBarBackgroundDrawable.setAlpha(newAlpha);
 
-        addParallaxEffect(scrollPosition);
+        addParallaxEffect();
     }
 
-    private void addParallaxEffect(int scrollPosition) {
-        float damping = mUseParallax ? 0.5f : 1.0f;
-        int dampedScroll = (int) (scrollPosition * damping);
-        int offset = mLastDampedScroll - dampedScroll;
-        mHeaderContainer.offsetTopAndBottom(offset);
+	private void addParallaxEffect() {
+		int offset = mMarginView.getBottom() - mListViewBackgroundView.getTop();
+		mListViewBackgroundView.offsetTopAndBottom(offset);
 
-        if (mListViewBackgroundView != null) {
-            offset = mLastScrollPosition - scrollPosition;
-            mListViewBackgroundView.offsetTopAndBottom(offset);
-        }
+		if (mUseParallax) {
+			offset = mMarginView.getTop() / 2 - mHeaderContainer.getTop();
+		}
 
-        if (mFirstGlobalLayoutPerformed) {
-            mLastScrollPosition = scrollPosition;
-            mLastDampedScroll = dampedScroll;
-        }
-    }
+		mHeaderContainer.offsetTopAndBottom(offset);
+	}
 
     private void updateHeaderHeight(int headerHeight) {
     	if (mMarginView != null) {
