@@ -273,17 +273,30 @@ public class FadingActionBarHelper {
         int newAlpha = (int) (ratio * 255);
         mActionBarBackgroundDrawable.setAlpha(newAlpha);
 
-        addParallaxEffect();
+		if (mListViewBackgroundView != null) {
+			addParallaxEffect();
+		} else {
+	        addParallaxEffect(scrollPosition);
+		}
     }
 
-	private void addParallaxEffect() {
+	private void addParallaxEffect() {		
 		int offset = mMarginView.getBottom() - mListViewBackgroundView.getTop();
 		mListViewBackgroundView.offsetTopAndBottom(offset);
 
 		if (mUseParallax) {
 			offset = mMarginView.getTop() / 2 - mHeaderContainer.getTop();
+		}		
+		mHeaderContainer.offsetTopAndBottom(offset);
+	}
+	
+	private void addParallaxEffect(int scrollPosition) {
+		int offset = scrollPosition;
+		if (mUseParallax) {
+			offset /= 2;
 		}
-
+	
+		offset = Math.abs(mHeaderContainer.getTop()) - offset;
 		mHeaderContainer.offsetTopAndBottom(offset);
 	}
 
