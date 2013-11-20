@@ -291,11 +291,11 @@ public class FadingActionBarHelper {
 	}
 	
 	private void addParallaxEffect(int scrollPosition) {
-		int offset = scrollPosition;
+		int offset = Math.abs(scrollPosition); // Sometimes, it may be a negative number.
 		if (mUseParallax) {
 			offset /= 2;
 		}
-	
+
 		offset = Math.abs(mHeaderContainer.getTop()) - offset;
 		mHeaderContainer.offsetTopAndBottom(offset);
 	}
