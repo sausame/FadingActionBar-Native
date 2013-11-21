@@ -235,13 +235,14 @@ public class FadingActionBarHelper {
         listView.setOnScrollListener(mOnScrollListener);
         return mContentContainer;
     }
+    
 
     private OnScrollListener mOnScrollListener = new OnScrollListener() {
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         	if (mHeaderView != null) {
-	            View topChild = view.getChildAt(0);
-                onNewScroll(topChild == mMarginView);
+	            View topChild = view.getChildAt(0);	            
+	            onNewScroll(topChild == mMarginView);
         	} else {
         		onNewScroll(firstVisibleItem, visibleItemCount, totalItemCount);        		
         	}
@@ -300,25 +301,22 @@ public class FadingActionBarHelper {
     }
 
 	private void addParallaxEffect() {
-		int offset = mMarginView.getBottom() - mListViewBackgroundView.getTop();
-		mListViewBackgroundView.offsetTopAndBottom(offset);
+		int offset = mMarginView.getBottom() - mListViewBackgroundView.getTop();		
+		if (offset != 0) mListViewBackgroundView.offsetTopAndBottom(offset);
 
-		if (mUseParallax) {
-			offset = mMarginView.getTop() / 2 - mHeaderContainer.getTop();
-		}		
-		mHeaderContainer.offsetTopAndBottom(offset);
+		if (mUseParallax) offset = mMarginView.getTop() / 2 - mHeaderContainer.getTop();
+		if (offset != 0) mHeaderContainer.offsetTopAndBottom(offset);
 	}
 
 	private void hideHeader() {
-		int offset = -1 * mListViewBackgroundView.getHeight() - mListViewBackgroundView.getTop();
-		if (offset != 0) {
-			mListViewBackgroundView.offsetTopAndBottom(offset);
-		}
-
-		offset = -1 * mHeaderContainer.getHeight() - mHeaderContainer.getTop();		
-		if (offset != 0) {
-			mHeaderContainer.offsetTopAndBottom(offset);
-		}
+		int offset = -1 * mListViewBackgroundView.getTop();
+		if (offset != 0) mListViewBackgroundView.offsetTopAndBottom(offset);
+		
+		offset = -1 * mHeaderContainer.getHeight();
+		if (mUseParallax) offset /= 2;
+		
+		offset -= mHeaderContainer.getTop();
+		if (offset != 0) mHeaderContainer.offsetTopAndBottom(offset);		
 	}
 	
 	private void addParallaxEffect(int scrollPosition) {
