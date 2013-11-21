@@ -241,13 +241,7 @@ public class FadingActionBarHelper {
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         	if (mHeaderView != null) {
 	            View topChild = view.getChildAt(0);
-	            if (topChild == null) {
-	                onNewScroll(0);
-	            } else if (topChild != mMarginView) {
-	                onNewScroll(mHeaderContainer.getHeight());                
-	            } else {
-	                onNewScroll(-topChild.getTop());
-	            }
+                onNewScroll(topChild == mMarginView);
         	} else {
         		onNewScroll(firstVisibleItem, visibleItemCount, totalItemCount);        		
         	}
@@ -258,6 +252,35 @@ public class FadingActionBarHelper {
         }
     };
 
+    private void onNewScroll(boolean isMarginViewExist) {
+        if (mActionBar == null) {
+            return;
+        }
+        
+        int currentHeaderHeight = mHeaderContainer.getHeight();
+        if (currentHeaderHeight != mLastHeaderHeight) {
+            updateHeaderHeight(currentHeaderHeight);
+        }
+
+        int scrollPosition;        
+        if (isMarginViewExist) {
+        	scrollPosition = -1 * mMarginView.getTop();
+        } else {
+        	scrollPosition = mHeaderContainer.getHeight();
+        }
+
+        int headerHeight = currentHeaderHeight - mActionBar.getHeight();
+        float ratio = (float) Math.min(Math.max(scrollPosition, 0), headerHeight) / headerHeight;
+        int newAlpha = (int) (ratio * 255);
+        mActionBarBackgroundDrawable.setAlpha(newAlpha);
+
+        if (isMarginViewExist) {
+        	addParallaxEffect();
+        } else {
+        	hideHeader();
+        }
+    }
+    
     private void onNewScroll(int scrollPosition) {
         if (mActionBar == null) {
             return;
@@ -273,14 +296,10 @@ public class FadingActionBarHelper {
         int newAlpha = (int) (ratio * 255);
         mActionBarBackgroundDrawable.setAlpha(newAlpha);
 
-		if (mListViewBackgroundView != null) {
-			addParallaxEffect();
-		} else {
-	        addParallaxEffect(scrollPosition);
-		}
+        addParallaxEffect(scrollPosition);
     }
 
-	private void addParallaxEffect() {		
+	private void addParallaxEffect() {
 		int offset = mMarginView.getBottom() - mListViewBackgroundView.getTop();
 		mListViewBackgroundView.offsetTopAndBottom(offset);
 
@@ -288,6 +307,18 @@ public class FadingActionBarHelper {
 			offset = mMarginView.getTop() / 2 - mHeaderContainer.getTop();
 		}		
 		mHeaderContainer.offsetTopAndBottom(offset);
+	}
+
+	private void hideHeader() {
+		int offset = -1 * mListViewBackgroundView.getHeight() - mListViewBackgroundView.getTop();
+		if (offset != 0) {
+			mListViewBackgroundView.offsetTopAndBottom(offset);
+		}
+
+		offset = -1 * mHeaderContainer.getHeight() - mHeaderContainer.getTop();		
+		if (offset != 0) {
+			mHeaderContainer.offsetTopAndBottom(offset);
+		}
 	}
 	
 	private void addParallaxEffect(int scrollPosition) {
